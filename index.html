@@ -4,12 +4,12 @@
   <meta charset="utf-8" />
   <title>Gold Price Calculator</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 24px; max-width:480px; }
+    body { font-family: Arial, sans-serif; padding: 24px; max-width:520px; }
     label { display:block; margin-top:12px; }
     input { width:100%; padding:8px; box-sizing:border-box; margin-top:6px; }
     .row { display:flex; gap:8px; }
     .row > div { flex:1; }
-    button { margin-top:12px; padding:10px 14px; }
+    button { margin-top:12px; padding:10px 14px; cursor:pointer; }
     .result { margin-top:16px; padding:12px; background:#f2f2f2; border-radius:6px; }
   </style>
 </head>
@@ -29,15 +29,17 @@
     <input id="making" type="number" step="0.01" value="10">
   </label>
 
+  <label>GST (%)
+    <input id="gst" type="number" step="0.01" value="3">
+  </label>
+
+  <label>Total Price (₹) — enter if you want to reverse calculate
+    <input id="total" type="number" step="0.01" placeholder="Leave blank if calculating normally">
+  </label>
+
   <div class="row">
-    <div>
-      <label>GST (%)
-        <input id="gst" type="number" step="0.01" value="3">
-      </label>
-    </div>
-    <div style="align-self:end;">
-      <button id="calc">Calculate</button>
-    </div>
+    <div><button id="calc">Calculate</button></div>
+    <div><button id="reverse">Find Making %</button></div>
   </div>
 
   <div class="result" id="result">
@@ -52,37 +54,56 @@
       const makingPercent = parseFloat(document.getElementById('making').value) || 0;
       const gst = parseFloat(document.getElementById('gst').value) || 0;
 
-      // Base amount = gold value
       const base = price * weight;
-
-      // Making charges as percentage of gold value
       const making = base * (makingPercent / 100);
-
-      // Taxable amount
       const taxable = base + making;
-
-      // Final price after GST
       const final = taxable * (1 + gst / 100);
-
-      // Price per gram (including making & GST)
       const pricePerGram = final / (weight || 1);
 
-      // Show results rounded to 2 decimals
       document.getElementById('result').innerHTML = 
         `<strong>Final price:</strong> ₹ ${final.toFixed(2)}<br>` +
         `<strong>Price per gram (incl. making & GST):</strong> ₹ ${pricePerGram.toFixed(2)}<br>` +
         `<small>(Base: ₹ ${base.toFixed(2)} + Making ₹ ${making.toFixed(2)} = Taxable ₹ ${taxable.toFixed(2)})</small>`;
     }
 
-    // instant calculate when button clicked
-    document.getElementById('calc').addEventListener('click', calcFinal);
+    function reverseCalc() {
+      const price = parseFloat(document.getElementById('price').value) || 0;
+      const weight = parseFloat(document.getElementById('weight').value) || 0;
+      const gst = parseFloat(document.getElementById('gst').value) || 0;
+      const total = parseFloat(document.getElementById('total').value) || 0;
 
-    // optional: recalc as values change
+      const base = price * weight;
+      if (base === 0 || total === 0) {
+        alert("Please enter Gold Price, Weight, GST% and Total Price.");
+        return;
+      }
+
+      // Remove GST first
+      const taxable = total / (1 + gst / 100);
+
+      // Find making charges value
+      const makingValue = taxable - base;
+
+      // Convert to %
+      const makingPercent = (makingValue / base) * 100;
+
+      document.getElementById('making').value = makingPercent.toFixed(2);
+
+      document.getElementById('result').innerHTML =
+        `<strong>Making Charges:</strong> ₹ ${makingValue.toFixed(2)} (${makingPercent.toFixed(2)}%)<br>` +
+        `<strong>Base Gold Value:</strong> ₹ ${base.toFixed(2)}<br>` +
+        `<strong>Taxable (before GST):</strong> ₹ ${taxable.toFixed(2)}<br>` +
+        `<strong>Total Price (with GST):</strong> ₹ ${total.toFixed(2)}`;
+    }
+
+    document.getElementById('calc').addEventListener('click', calcFinal);
+    document.getElementById('reverse').addEventListener('click', reverseCalc);
+
+    // Auto update while typing (optional)
     ['price','weight','making','gst'].forEach(id =>
       document.getElementById(id).addEventListener('input', calcFinal)
     );
 
-    // initial calculation
     calcFinal();
   </script>
 </body>
