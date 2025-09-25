@@ -13,7 +13,7 @@
       color: #222;
     }
     .container {
-      max-width: 480px;
+      max-width: 520px;
       margin: auto;
       background: #fff;
       padding: 20px;
@@ -70,6 +70,10 @@
       font-size: 0.95rem;
       line-height: 1.5;
     }
+    .gst {
+      color: #d60000;
+      font-weight: bold;
+    }
     @media(max-width: 480px) {
       body { padding: 10px; }
       .container { padding: 16px; }
@@ -84,15 +88,15 @@
     <h2>Gold Price Calculator</h2>
 
     <label>Gold price (₹ per gram)
-      <input id="price" type="number" step="0.01" value="6000">
+      <input id="price" type="number" step="0.01" value="10615">
     </label>
 
     <label>Weight (grams)
-      <input id="weight" type="number" step="0.01" value="10">
+      <input id="weight" type="number" step="0.01" value="4.062">
     </label>
 
     <label>Making charges (% of gold value)
-      <input id="making" type="number" step="0.01" value="10">
+      <input id="making" type="number" step="0.01" value="20.93">
     </label>
 
     <label>GST (%)
@@ -124,13 +128,17 @@
       const base = price * weight;
       const making = base * (makingPercent / 100);
       const taxable = base + making;
-      const final = taxable * (1 + gst / 100);
+      const gstValue = taxable * (gst / 100);
+      const final = taxable + gstValue;
       const pricePerGram = final / (weight || 1);
 
       document.getElementById('result').innerHTML = 
         `<strong>Final price:</strong> ₹ ${final.toFixed(2)}<br>` +
         `<strong>Price per gram (incl. making & GST):</strong> ₹ ${pricePerGram.toFixed(2)}<br>` +
-        `<small>(Base: ₹ ${base.toFixed(2)} + Making ₹ ${making.toFixed(2)} = Taxable ₹ ${taxable.toFixed(2)})</small>`;
+        `<strong>Base Gold Value:</strong> ₹ ${base.toFixed(2)}<br>` +
+        `<strong>Making Charges:</strong> ₹ ${making.toFixed(2)} (${makingPercent}%)<br>` +
+        `<span class="gst">GST: ₹ ${gstValue.toFixed(2)} (${gst}%)</span><br>` +
+        `<strong>Taxable (before GST):</strong> ₹ ${taxable.toFixed(2)}`;
     }
 
     function reverseCalc() {
@@ -148,6 +156,7 @@
       const taxable = total / (1 + gst / 100);
       const makingValue = taxable - base;
       const makingPercent = (makingValue / base) * 100;
+      const gstValue = taxable * (gst / 100);
 
       document.getElementById('making').value = makingPercent.toFixed(2);
 
@@ -155,6 +164,7 @@
         `<strong>Making Charges:</strong> ₹ ${makingValue.toFixed(2)} (${makingPercent.toFixed(2)}%)<br>` +
         `<strong>Base Gold Value:</strong> ₹ ${base.toFixed(2)}<br>` +
         `<strong>Taxable (before GST):</strong> ₹ ${taxable.toFixed(2)}<br>` +
+        `<span class="gst">GST: ₹ ${gstValue.toFixed(2)} (${gst}%)</span><br>` +
         `<strong>Total Price (with GST):</strong> ₹ ${total.toFixed(2)}`;
     }
 
