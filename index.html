@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Gold Price Calculator from master</title>
+  <title>Price Calculator from master</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,26 +13,30 @@
       background: #fafafa;
       color: #222;
     }
+
     .container {
       max-width: 520px;
       margin: auto;
       background: #fff;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
+
     h2 {
       margin-top: 0;
       text-align: center;
       font-size: 1.3rem;
       color: #444;
     }
+
     label {
       display: block;
       margin-top: 14px;
       font-size: 0.95rem;
       font-weight: 500;
     }
+
     input {
       width: 100%;
       padding: 10px;
@@ -41,12 +46,14 @@
       font-size: 1rem;
       box-sizing: border-box;
     }
+
     .row {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 16px;
     }
+
     .row button {
       flex: 1 1 45%;
       padding: 12px;
@@ -58,9 +65,11 @@
       cursor: pointer;
       transition: background 0.2s;
     }
+
     .row button:hover {
       background: #0056c9;
     }
+
     .result {
       margin-top: 20px;
       padding: 14px;
@@ -70,19 +79,36 @@
       font-size: 0.95rem;
       line-height: 1.5;
     }
+
     .gst {
       color: #d60000;
       font-weight: bold;
     }
+
     @media(max-width: 480px) {
-      body { padding: 10px; }
-      .container { padding: 16px; }
-      h2 { font-size: 1.1rem; }
-      input { font-size: 0.95rem; }
-      .row button { flex: 1 1 100%; }
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 16px;
+      }
+
+      h2 {
+        font-size: 1.1rem;
+      }
+
+      input {
+        font-size: 0.95rem;
+      }
+
+      .row button {
+        flex: 1 1 100%;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h2>Gold Price Calculator 2 dev</h2>
@@ -132,7 +158,7 @@
       const final = taxable + gstValue;
       const pricePerGram = final / (weight || 1);
 
-      document.getElementById('result').innerHTML = 
+      document.getElementById('result').innerHTML =
         `<strong>Final price:</strong> ₹ ${final.toFixed(2)}<br>` +
         `<strong>Price per gram (incl. making & GST):</strong> ₹ ${pricePerGram.toFixed(2)}<br>` +
         `<strong>Base Gold Value:</strong> ₹ ${base.toFixed(2)}<br>` +
@@ -171,11 +197,12 @@
     document.getElementById('calc').addEventListener('click', calcFinal);
     document.getElementById('reverse').addEventListener('click', reverseCalc);
 
-    ['price','weight','making','gst'].forEach(id =>
+    ['price', 'weight', 'making', 'gst'].forEach(id =>
       document.getElementById(id).addEventListener('input', calcFinal)
     );
 
     calcFinal();
   </script>
 </body>
+
 </html>
