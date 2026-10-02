@@ -1,207 +1,672 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Price Calculator from master</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meesho Price Calculator</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    * {
+      box-sizing: border-box;
       margin: 0;
-      padding: 16px;
-      background: #fafafa;
-      color: #222;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: #f0f0f0;
+      min-height: 100vh;
+      padding: 20px;
     }
 
     .container {
-      max-width: 520px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      max-width: 560px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+      padding: 28px;
     }
 
-    h2 {
-      margin-top: 0;
-      text-align: center;
-      font-size: 1.3rem;
-      color: #444;
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 4px;
     }
 
-    label {
-      display: block;
-      margin-top: 14px;
-      font-size: 0.95rem;
-      font-weight: 500;
+    .subtitle {
+      color: #777;
+      font-size: 0.88rem;
+      margin-bottom: 26px;
     }
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-      box-sizing: border-box;
+    .section {
+      margin-bottom: 22px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #e85d04;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #fde8d8;
     }
 
     .row {
       display: flex;
+      gap: 12px;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
+      align-items: end;
     }
 
-    .row button {
-      flex: 1 1 45%;
-      padding: 12px;
-      font-size: 1rem;
-      border: none;
+    .field {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .field.full {
+      flex: 100%;
+      min-width: 100%;
+    }
+
+    label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #ddd;
       border-radius: 8px;
-      background: #007bff;
-      color: white;
-      cursor: pointer;
-      transition: background 0.2s;
+      font-size: 0.95rem;
+      color: #1a1a1a;
+      background: white;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .row button:hover {
-      background: #0056c9;
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #e85d04;
+      box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.12);
+    }
+
+    input::placeholder {
+      color: #bbb;
+    }
+
+    .help {
+      font-size: 0.68rem;
+      color: #999;
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #e85d04;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 6px;
+    }
+
+    .btn:hover {
+      background: #cf5203;
+    }
+
+    .btn:active {
+      transform: scale(0.99);
     }
 
     .result {
-      margin-top: 20px;
-      padding: 14px;
-      background: #f1f5ff;
-      border-left: 4px solid #007bff;
+      background: #fef8f4;
+      border: 1px solid #f5d8c0;
+      border-radius: 10px;
+      padding: 18px;
+      margin-top: 22px;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #e85d04;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 12px;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid #f5dfd0;
+      font-size: 0.88rem;
+    }
+
+    .result-row:last-child {
+      border-bottom: none;
+    }
+
+    .result-row .lbl {
+      color: #666;
+    }
+
+    .result-row .val {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .result-row.sub .lbl {
+      color: #aaa;
+      font-size: 0.78rem;
+      padding-left: 14px;
+      font-style: italic;
+    }
+
+    .result-row.sub .val {
+      color: #aaa;
+      font-size: 0.78rem;
+      font-weight: 400;
+    }
+
+    .result-row.itc .val {
+      color: #2e7d32;
+    }
+
+    .result-row.total-row .lbl {
+      font-weight: 700;
+      color: #333;
+    }
+
+    .result-row.total-row .val {
+      color: #e85d04;
+      font-size: 1.05rem;
+    }
+
+    .gst-strip {
+      background: #fff3ea;
+      margin: 10px -18px 0 -18px;
+      padding: 10px 18px;
+      font-size: 0.78rem;
+      color: #888;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .gst-strip span b {
+      color: #1a1a1a;
+    }
+
+    .final-price-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0 8px;
+      border-top: 2px solid #e85d04;
+      margin-top: 8px;
+      font-size: 1rem;
+    }
+
+    .final-price-row .lbl {
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .final-price-row .val {
+      font-weight: 800;
+      color: #e85d04;
+      font-size: 1.2rem;
+    }
+
+    .profit-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 0.88rem;
+    }
+
+    .profit-row .lbl {
+      color: #666;
+    }
+
+    .profit-row .val {
+      font-weight: 600;
+      color: #2e7d32;
+    }
+
+    .margin-row .val {
+      color: #1a1a1a;
+    }
+
+    .qr-section {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid #f5d8c0;
+    }
+
+    .qr-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .qr-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .qr-item {
+      background: white;
+      border: 1px solid #f0d8c8;
       border-radius: 8px;
-      font-size: 0.95rem;
-      line-height: 1.5;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .gst {
-      color: #d60000;
-      font-weight: bold;
+    .qr-item .qr-label {
+      font-size: 0.78rem;
+      color: #666;
     }
 
-    @media(max-width: 480px) {
-      body {
-        padding: 10px;
-      }
+    .qr-item .qr-value {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #e85d04;
+    }
 
-      .container {
-        padding: 16px;
-      }
+    .qr-item.breakeven {
+      grid-column: 1 / -1;
+      background: #fff3ea;
+    }
 
-      h2 {
-        font-size: 1.1rem;
-      }
+    .qr-item.breakeven .qr-label {
+      font-weight: 600;
+      color: #555;
+    }
 
-      input {
-        font-size: 0.95rem;
-      }
-
-      .row button {
-        flex: 1 1 100%;
-      }
+    .qr-item.breakeven .qr-value {
+      font-size: 1rem;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h2>Gold Price Calculator</h2>
+    <h1>Meesho Price Calculator</h1>
+    <p class="subtitle">Realistic selling price with all costs — returns, RTO, damage &amp; taxes</p>
 
-    <label>Gold price (₹ per gram)
-      <input id="price" type="number" step="0.01" value="10615">
-    </label>
+    <form id="calculatorForm">
 
-    <label>Weight (grams)
-      <input id="weight" type="number" step="0.01" value="4.062">
-    </label>
+      <div class="section">
+        <div class="section-title">Product Costs</div>
+        <div class="row">
+          <div class="field">
+            <label>Product Cost (COGS) *</label>
+            <input type="number" id="productCost" placeholder="e.g. 150" min="0" step="0.01" required>
+            <div class="help">Landed cost: purchase + inward freight + QC</div>
+          </div>
+          <div class="field">
+            <label>Packaging Cost</label>
+            <input type="number" id="packagingCost" placeholder="e.g. 15" min="0" step="0.01" value="15">
+            <div class="help">Box, bubble wrap, tape, label per unit</div>
+          </div>
+        </div>
+      </div>
 
-    <label>Making charges (% of gold value)
-      <input id="making" type="number" step="0.01" value="20.93">
-    </label>
+      <div class="section">
+        <div class="section-title">Forward Shipping</div>
+        <div class="row">
+          <div class="field">
+            <label>Shipping Zone</label>
+            <select id="shippingZone">
+              <option value="local">Local (Intra-city)</option>
+              <option value="regional">Regional (Intra-state)</option>
+              <option value="national" selected>National (Inter-state)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Weight Slab</label>
+            <select id="weightSlab">
+              <option value="500" selected>Up to 500g</option>
+              <option value="1000">500g - 1kg</option>
+              <option value="1500">1kg - 1.5kg</option>
+              <option value="2000">1.5kg - 2kg</option>
+            </select>
+          </div>
+        </div>
+        <div class="help" style="margin-top:8px;">Forward Shipping &amp; GST on Shipping (18%) are auto-calculated from
+          zone + weight slab.</div>
+      </div>
 
-    <label>GST (%)
-      <input id="gst" type="number" step="0.01" value="3">
-    </label>
+      <div class="section">
+        <div class="section-title">Returns, RTO &amp; Losses</div>
+        <div class="row">
+          <div class="field">
+            <label>Customer Return %</label>
+            <input type="number" id="returnRate" placeholder="e.g. 10" min="0" max="100" step="1" value="10">
+            <div class="help">% orders returned by customer after delivery</div>
+          </div>
+          <div class="field">
+            <label>Reverse Shipping Cost</label>
+            <input type="number" id="reverseShipping" placeholder="e.g. 60" min="0" step="0.01" value="60">
+            <div class="help">Per customer-return shipment</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <div class="field">
+            <label>RTO %</label>
+            <input type="number" id="rtoRate" placeholder="e.g. 10" min="0" max="100" step="1" value="10">
+            <div class="help">% orders undelivered &amp; returned (RTO)</div>
+          </div>
+          <div class="field">
+            <label>RTO Shipping Cost</label>
+            <input type="number" id="rtoShipping" placeholder="e.g. 55" min="0" step="0.01" value="55">
+            <div class="help">Per RTO shipment back to warehouse</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <div class="field">
+            <label>Damage / Loss %</label>
+            <input type="number" id="damageLossRate" placeholder="e.g. 2" min="0" max="100" step="0.1" value="2">
+            <div class="help">% orders with damage or lost in transit (product cost written off)</div>
+          </div>
+          <div class="field"></div>
+        </div>
+      </div>
 
-    <label>Total Price (₹) — enter for reverse calculation
-      <input id="total" type="number" step="0.01" placeholder="Leave blank if calculating normally">
-    </label>
+      <div class="section">
+        <div class="section-title">Other Costs</div>
+        <div class="row">
+          <div class="field">
+            <label>Advertisement Cost per Order</label>
+            <input type="number" id="adSpend" placeholder="e.g. 10" min="0" step="0.01" value="0">
+            <div class="help">Avg ad spend allocated per sold order</div>
+          </div>
+          <div class="field">
+            <label>Other Meesho Charges</label>
+            <input type="number" id="otherCharges" placeholder="e.g. 5" min="0" step="0.01" value="0">
+            <div class="help">Any other platform / operational charges</div>
+          </div>
+        </div>
+      </div>
 
-    <div class="row">
-      <button id="calc">Calculate</button>
-      <button id="reverse">Find Making %</button>
-    </div>
+      <div class="section">
+        <div class="section-title">Taxes &amp; Target</div>
+        <div class="row">
+          <div class="field">
+            <label>GST Rate %</label>
+            <select id="gstRate">
+              <option value="5">5% (Essential items)</option>
+              <option value="12">12% (Home decor, Lighting)</option>
+              <option value="18" selected>18% (Electronics, etc.)</option>
+              <option value="28">28% (Luxury goods)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Actual ITC Amount (&#8377;)</label>
+            <input type="number" id="itcAmount" placeholder="e.g. 17" min="0" step="0.01" value="0">
+            <div class="help">Enter actual ITC &#8377; from your purchase/service invoices only</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <div class="field">
+            <label>Target Profit Margin %</label>
+            <input type="number" id="targetMargin" placeholder="e.g. 20" min="0" max="100" step="1" value="20">
+            <div class="help">Net profit as % of selling price excl. GST (standard accounting basis)</div>
+          </div>
+          <div class="field"></div>
+        </div>
+      </div>
 
-    <div class="result" id="result">
-      Final price: — <br>
-      Price per gram (incl. GST): —
+      <button type="submit" class="btn">Calculate Selling Price</button>
+    </form>
+
+    <div id="result" class="result">
+      <div class="result-title">Price Breakdown</div>
+
+      <div class="result-row"><span class="lbl">1. Product Cost</span><span class="val"
+          id="r-productCost">&#8377;0</span></div>
+      <div class="result-row"><span class="lbl">2. Packaging</span><span class="val" id="r-packaging">&#8377;0</span>
+      </div>
+      <div class="result-row"><span class="lbl">3. Forward Shipping</span><span class="val"
+          id="r-fwdShipping">&#8377;0</span></div>
+      <div class="result-row"><span class="lbl">4. GST on Shipping (18%)</span><span class="val"
+          id="r-gstShipping">&#8377;0</span></div>
+      <div class="result-row"><span class="lbl">5. Customer Return Cost</span><span class="val"
+          id="r-returnCost">&#8377;0</span></div>
+      <div class="result-row sub"><span class="lbl" id="r-returnDetail"></span><span class="val"></span></div>
+      <div class="result-row"><span class="lbl">6. RTO Cost</span><span class="val" id="r-rtoCost">&#8377;0</span></div>
+      <div class="result-row sub"><span class="lbl" id="r-rtoDetail"></span><span class="val"></span></div>
+      <div class="result-row"><span class="lbl">7. Damage / Loss Cost</span><span class="val"
+          id="r-damageCost">&#8377;0</span></div>
+      <div class="result-row sub"><span class="lbl" id="r-damageDetail"></span><span class="val"></span></div>
+      <div class="result-row"><span class="lbl">8. Advertisement Cost</span><span class="val"
+          id="r-adSpend">&#8377;0</span></div>
+      <div class="result-row"><span class="lbl">9. Other Meesho Charges</span><span class="val"
+          id="r-otherCharges">&#8377;0</span></div>
+      <div class="result-row itc"><span class="lbl">10. Less: Eligible ITC Credit</span><span class="val"
+          id="r-itc">-&#8377;0</span></div>
+
+      <div class="result-row total-row"
+        style="margin-top:6px; padding-top:10px; border-top:1.5px solid #e85d04; border-bottom:none;">
+        <span class="lbl">Total Cost per Order</span>
+        <span class="val" id="r-totalCost">&#8377;0</span>
+      </div>
+
+      <div class="gst-strip">
+        <span>Selling Price (excl. GST): <b id="r-exGst">&#8377;0</b></span>
+        <span>+ GST: <b id="r-gstAmt">&#8377;0</b></span>
+      </div>
+
+      <div class="final-price-row">
+        <span class="lbl">Final Customer Price (incl. GST)</span>
+        <span class="val" id="r-finalPrice">&#8377;0</span>
+      </div>
+
+      <div class="profit-row">
+        <span class="lbl">Net Profit per Order</span>
+        <span class="val" id="r-netProfit">&#8377;0</span>
+      </div>
+      <div class="profit-row margin-row">
+        <span class="lbl">Actual Margin</span>
+        <span class="val" id="r-actualMargin">0%</span>
+      </div>
+
+      <div class="qr-section">
+        <div class="qr-title">Quick Reference &mdash; Prices (incl. GST)</div>
+        <div class="qr-grid">
+          <div class="qr-item breakeven">
+            <span class="qr-label">Break-even Price (0% margin)</span>
+            <span class="qr-value" id="r-breakeven">&#8377;0</span>
+          </div>
+          <div class="qr-item">
+            <span class="qr-label">10% Margin</span>
+            <span class="qr-value" id="r-m10">&#8377;0</span>
+          </div>
+          <div class="qr-item">
+            <span class="qr-label">15% Margin</span>
+            <span class="qr-value" id="r-m15">&#8377;0</span>
+          </div>
+          <div class="qr-item">
+            <span class="qr-label">20% Margin</span>
+            <span class="qr-value" id="r-m20">&#8377;0</span>
+          </div>
+          <div class="qr-item">
+            <span class="qr-label">25% Margin</span>
+            <span class="qr-value" id="r-m25">&#8377;0</span>
+          </div>
+          <div class="qr-item">
+            <span class="qr-label">30% Margin</span>
+            <span class="qr-value" id="r-m30">&#8377;0</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    function calcFinal() {
-      const price = parseFloat(document.getElementById('price').value) || 0;
-      const weight = parseFloat(document.getElementById('weight').value) || 0;
-      const makingPercent = parseFloat(document.getElementById('making').value) || 0;
-      const gst = parseFloat(document.getElementById('gst').value) || 0;
+    const shippingRates = {
+      local: { 500: 40, 1000: 60, 1500: 75, 2000: 85 },
+      regional: { 500: 55, 1000: 80, 1500: 100, 2000: 115 },
+      national: { 500: 70, 1000: 100, 1500: 125, 2000: 145 }
+    };
 
-      const base = price * weight;
-      const making = base * (makingPercent / 100);
-      const taxable = base + making;
-      const gstValue = taxable * (gst / 100);
-      const final = taxable + gstValue;
-      const pricePerGram = final / (weight || 1);
-
-      document.getElementById('result').innerHTML =
-        `<strong>Final price:</strong> ₹ ${final.toFixed(2)}<br>` +
-        `<strong>Price per gram (incl. making & GST):</strong> ₹ ${pricePerGram.toFixed(2)}<br>` +
-        `<strong>Base Gold Value:</strong> ₹ ${base.toFixed(2)}<br>` +
-        `<strong>Making Charges:</strong> ₹ ${making.toFixed(2)} (${makingPercent}%)<br>` +
-        `<span class="gst">GST: ₹ ${gstValue.toFixed(2)} (${gst}%)</span><br>` +
-        `<strong>Taxable (before GST):</strong> ₹ ${taxable.toFixed(2)}`;
+    function fmt(n) {
+      return '\u20B9' + Math.round(n).toLocaleString('en-IN');
     }
 
-    function reverseCalc() {
-      const price = parseFloat(document.getElementById('price').value) || 0;
-      const weight = parseFloat(document.getElementById('weight').value) || 0;
-      const gst = parseFloat(document.getElementById('gst').value) || 0;
-      const total = parseFloat(document.getElementById('total').value) || 0;
-
-      const base = price * weight;
-      if (base === 0 || total === 0) {
-        alert("Please enter Gold Price, Weight, GST% and Total Price.");
-        return;
-      }
-
-      const taxable = total / (1 + gst / 100);
-      const makingValue = taxable - base;
-      const makingPercent = (makingValue / base) * 100;
-      const gstValue = taxable * (gst / 100);
-
-      document.getElementById('making').value = makingPercent.toFixed(2);
-
-      document.getElementById('result').innerHTML =
-        `<strong>Making Charges:</strong> ₹ ${makingValue.toFixed(2)} (${makingPercent.toFixed(2)}%)<br>` +
-        `<strong>Base Gold Value:</strong> ₹ ${base.toFixed(2)}<br>` +
-        `<strong>Taxable (before GST):</strong> ₹ ${taxable.toFixed(2)}<br>` +
-        `<span class="gst">GST: ₹ ${gstValue.toFixed(2)} (${gst}%)</span><br>` +
-        `<strong>Total Price (with GST):</strong> ₹ ${total.toFixed(2)}`;
+    // margin on ex-GST settlement: settlement = totalCost / (1 - margin)
+    // finalPrice = settlement * (1 + gstRate) / 0.989
+    function priceAtMargin(totalCost, gstRate, margin) {
+      if (margin >= 1) return Infinity;
+      const settlement = totalCost / (1 - margin);
+      return settlement * (1 + gstRate) / 0.989;
     }
 
-    document.getElementById('calc').addEventListener('click', calcFinal);
-    document.getElementById('reverse').addEventListener('click', reverseCalc);
+    document.getElementById('calculatorForm').addEventListener('submit', function (e) {
+      e.preventDefault();
 
-    ['price', 'weight', 'making', 'gst'].forEach(id =>
-      document.getElementById(id).addEventListener('input', calcFinal)
-    );
+      const productCost = parseFloat(document.getElementById('productCost').value) || 0;
+      const packagingCost = parseFloat(document.getElementById('packagingCost').value) || 0;
+      const shippingZone = document.getElementById('shippingZone').value;
+      const weightSlab = document.getElementById('weightSlab').value;
+      const returnRate = (parseFloat(document.getElementById('returnRate').value) || 0) / 100;
+      const reverseShipping = parseFloat(document.getElementById('reverseShipping').value) || 0;
+      const rtoRate = (parseFloat(document.getElementById('rtoRate').value) || 0) / 100;
+      const rtoShipping = parseFloat(document.getElementById('rtoShipping').value) || 0;
+      const damageLossRate = (parseFloat(document.getElementById('damageLossRate').value) || 0) / 100;
+      const adSpend = parseFloat(document.getElementById('adSpend').value) || 0;
+      const otherCharges = parseFloat(document.getElementById('otherCharges').value) || 0;
+      const gstRate = parseFloat(document.getElementById('gstRate').value) / 100;
+      const itcCredit = parseFloat(document.getElementById('itcAmount').value) || 0;
+      const targetMargin = (parseFloat(document.getElementById('targetMargin').value) || 0) / 100;
 
-    calcFinal();
+      // Derived shipping costs
+      const fwdShipping = shippingRates[shippingZone][weightSlab];
+      const gstOnShipping = fwdShipping * 0.18;
+
+      // Return costs: customer return = returnRate x (reverseShipping + packagingCost repack)
+      const returnCost = returnRate * (reverseShipping + packagingCost);
+      // RTO costs: rtoRate x (rtoShipping + packagingCost lost)
+      const rtoCost = rtoRate * (rtoShipping + packagingCost);
+      // Damage/Loss: product cost written off
+      const damageCost = damageLossRate * productCost;
+
+      const totalCost = productCost + packagingCost + fwdShipping + gstOnShipping
+        + returnCost + rtoCost + damageCost
+        + adSpend + otherCharges - itcCredit;
+
+      // Margin on ex-GST settlement (correct basis — GST is pass-through)
+      // settlement = totalCost / (1 - targetMargin)
+      // finalPrice = settlement * (1 + gstRate) / 0.989
+      const settlement = totalCost / (1 - targetMargin);
+      const finalPrice = settlement * (1 + gstRate) / 0.989;
+      const exGst = finalPrice / (1 + gstRate);
+      const gstAmt = finalPrice - exGst;
+
+      const netProfit = settlement - totalCost;
+      const actualMargin = (netProfit / settlement) * 100;  // on ex-GST settlement
+
+      // Quick reference (all incl. GST, margin on ex-GST settlement)
+      const breakeven = priceAtMargin(totalCost, gstRate, 0);
+      const m10 = priceAtMargin(totalCost, gstRate, 0.10);
+      const m15 = priceAtMargin(totalCost, gstRate, 0.15);
+      const m20 = priceAtMargin(totalCost, gstRate, 0.20);
+      const m25 = priceAtMargin(totalCost, gstRate, 0.25);
+      const m30 = priceAtMargin(totalCost, gstRate, 0.30);
+
+      // Update DOM
+      document.getElementById('r-productCost').textContent = fmt(productCost);
+      document.getElementById('r-packaging').textContent = fmt(packagingCost);
+      document.getElementById('r-fwdShipping').textContent = fmt(fwdShipping);
+      document.getElementById('r-gstShipping').textContent = fmt(gstOnShipping);
+      document.getElementById('r-returnCost').textContent = fmt(returnCost);
+      document.getElementById('r-returnDetail').textContent =
+        (returnRate * 100).toFixed(0) + '% \u00D7 (Rev. Ship \u20B9' + reverseShipping + ' + Pkg \u20B9' + packagingCost + ')';
+      document.getElementById('r-rtoCost').textContent = fmt(rtoCost);
+      document.getElementById('r-rtoDetail').textContent =
+        (rtoRate * 100).toFixed(0) + '% \u00D7 (RTO Ship \u20B9' + rtoShipping + ' + Pkg \u20B9' + packagingCost + ')';
+      document.getElementById('r-damageCost').textContent = fmt(damageCost);
+      document.getElementById('r-damageDetail').textContent =
+        (damageLossRate * 100).toFixed(1) + '% \u00D7 Product Cost \u20B9' + productCost;
+      document.getElementById('r-adSpend').textContent = fmt(adSpend);
+      document.getElementById('r-otherCharges').textContent = fmt(otherCharges);
+      document.getElementById('r-itc').textContent = '-' + fmt(itcCredit);
+      document.getElementById('r-totalCost').textContent = fmt(totalCost);
+      document.getElementById('r-exGst').textContent = fmt(exGst);
+      document.getElementById('r-gstAmt').textContent = fmt(gstAmt);
+      document.getElementById('r-finalPrice').textContent = fmt(finalPrice);
+      document.getElementById('r-netProfit').textContent = fmt(netProfit);
+      document.getElementById('r-actualMargin').textContent = actualMargin.toFixed(1) + '%';
+
+      document.getElementById('r-breakeven').textContent = fmt(breakeven);
+      document.getElementById('r-m10').textContent = fmt(m10);
+      document.getElementById('r-m15').textContent = fmt(m15);
+      document.getElementById('r-m20').textContent = fmt(m20);
+      document.getElementById('r-m25').textContent = fmt(m25);
+      document.getElementById('r-m30').textContent = fmt(m30);
+
+      const resultEl = document.getElementById('result');
+      resultEl.classList.add('show');
+      resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
   </script>
 </body>
 
