@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meesho Price Calculator</title>
+  <title>Marketplace Price Calculator</title>
+  <meta name="description" content="Calculate the right selling price for Meesho, Flipkart and Amazon separately with all fees, returns, RTO, GST and profit margin.">
   <style>
     * {
       box-sizing: border-box;
@@ -19,6 +20,53 @@
       padding: 20px;
     }
 
+    /* ── Top selector ── */
+    .top-bar {
+      max-width: 560px;
+      margin: 0 auto 16px;
+    }
+
+    .platform-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .platform-select-wrap label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #444;
+      white-space: nowrap;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-bottom: 0;
+    }
+
+    #platformSelect {
+      flex: 1;
+      padding: 11px 14px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      background: white;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 38px;
+    }
+
+    #platformSelect:focus {
+      outline: none;
+      border-color: #e85d04;
+      box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.12);
+    }
+
+    /* ── Container ── */
     .container {
       max-width: 560px;
       margin: 0 auto;
@@ -28,19 +76,45 @@
       padding: 28px;
     }
 
-    h1 {
-      font-size: 1.5rem;
+    /* Platform header inside card */
+    .platform-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .platform-header h1 {
+      font-size: 1.4rem;
       font-weight: 700;
       color: #1a1a1a;
-      margin-bottom: 4px;
     }
+
+    .platform-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      color: white;
+    }
+
+    .badge-meesho  { background: #e85d04; }
+    .badge-flipkart { background: #2874f0; }
+    .badge-amazon  { background: #ff9900; }
 
     .subtitle {
       color: #777;
-      font-size: 0.88rem;
-      margin-bottom: 26px;
+      font-size: 0.86rem;
+      margin-bottom: 24px;
     }
 
+    /* ── Forms visibility ── */
+    .platform-form { display: none; }
+    .platform-form.active { display: block; }
+
+    /* ── Sections ── */
     .section {
       margin-bottom: 22px;
       padding-bottom: 22px;
@@ -54,9 +128,8 @@
     }
 
     .section-title {
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       font-weight: 700;
-      color: #e85d04;
       text-transform: uppercase;
       letter-spacing: 0.8px;
       margin-bottom: 14px;
@@ -69,9 +142,17 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: #fde8d8;
     }
 
+    /* Platform colour themes */
+    .theme-meesho  .section-title { color: #e85d04; }
+    .theme-meesho  .section-title::after { background: #fde8d8; }
+    .theme-flipkart .section-title { color: #2874f0; }
+    .theme-flipkart .section-title::after { background: #d5e4ff; }
+    .theme-amazon  .section-title { color: #cc7a00; }
+    .theme-amazon  .section-title::after { background: #ffe8b3; }
+
+    /* ── Fields ── */
     .row {
       display: flex;
       gap: 12px;
@@ -84,14 +165,9 @@
       min-width: 140px;
     }
 
-    .field.full {
-      flex: 100%;
-      min-width: 100%;
-    }
-
     label {
       display: block;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 600;
       color: #555;
       margin-bottom: 5px;
@@ -99,575 +175,1012 @@
       letter-spacing: 0.3px;
     }
 
-    input,
-    select {
+    input, select.field-select {
       width: 100%;
       padding: 10px 12px;
       border: 1.5px solid #ddd;
       border-radius: 8px;
-      font-size: 0.95rem;
+      font-size: 0.93rem;
       color: #1a1a1a;
       background: white;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #e85d04;
-      box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.12);
-    }
+    .theme-meesho  input:focus, .theme-meesho  select.field-select:focus { outline:none; border-color: #e85d04; box-shadow: 0 0 0 3px rgba(232,93,4,.12); }
+    .theme-flipkart input:focus, .theme-flipkart select.field-select:focus { outline:none; border-color: #2874f0; box-shadow: 0 0 0 3px rgba(40,116,240,.12); }
+    .theme-amazon  input:focus, .theme-amazon  select.field-select:focus { outline:none; border-color: #cc7a00; box-shadow: 0 0 0 3px rgba(204,122,0,.12); }
 
-    input::placeholder {
-      color: #bbb;
-    }
+    input::placeholder { color: #bbb; }
 
     .help {
-      font-size: 0.68rem;
+      font-size: 0.67rem;
       color: #999;
       margin-top: 3px;
       line-height: 1.3;
     }
 
-    .btn {
-      width: 100%;
-      padding: 14px;
-      background: #e85d04;
-      color: white;
-      border: none;
+    /* Slider */
+    .slider-wrap { display: flex; align-items: center; gap: 10px; }
+    .slider-wrap input[type=range] {
+      flex: 1; padding: 0; height: 4px; background: #ddd;
+      border: none; border-radius: 4px; cursor: pointer;
+    }
+    .theme-meesho  .slider-wrap input[type=range] { accent-color: #e85d04; }
+    .theme-flipkart .slider-wrap input[type=range] { accent-color: #2874f0; }
+    .theme-amazon  .slider-wrap input[type=range] { accent-color: #cc7a00; }
+
+    .slider-val {
+      min-width: 44px; text-align: right;
+      font-weight: 700; font-size: 0.93rem;
+    }
+    .theme-meesho  .slider-val { color: #e85d04; }
+    .theme-flipkart .slider-val { color: #2874f0; }
+    .theme-amazon  .slider-val { color: #cc7a00; }
+
+    /* Fee box */
+    .fee-box {
       border-radius: 10px;
-      font-size: 1rem;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+    }
+    .theme-meesho  .fee-box { background: rgba(232,93,4,.07);  border: 1.5px solid #e85d04; }
+    .theme-flipkart .fee-box { background: rgba(40,116,240,.07); border: 1.5px solid #2874f0; }
+    .theme-amazon  .fee-box { background: rgba(204,122,0,.07); border: 1.5px solid #cc7a00; }
+
+    .fee-box-title {
+      font-size: 0.7rem;
       font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 12px;
     }
+    .theme-meesho  .fee-box-title { color: #e85d04; }
+    .theme-flipkart .fee-box-title { color: #2874f0; }
+    .theme-amazon  .fee-box-title { color: #cc7a00; }
 
-    .btn:hover {
-      background: #cf5203;
+    /* ── Button ── */
+    .btn {
+      width: 100%; padding: 14px; color: white; border: none;
+      border-radius: 10px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: filter 0.2s, transform 0.1s; margin-top: 6px;
     }
+    .btn:hover { filter: brightness(1.1); }
+    .btn:active { transform: scale(0.99); }
+    .theme-meesho  .btn { background: #e85d04; }
+    .theme-flipkart .btn { background: #2874f0; }
+    .theme-amazon  .btn { background: #e08c00; }
 
-    .btn:active {
-      transform: scale(0.99);
-    }
-
+    /* ── Results ── */
     .result {
-      background: #fef8f4;
-      border: 1px solid #f5d8c0;
+      background: #fafafa;
+      border: 1px solid #eee;
       border-radius: 10px;
       padding: 18px;
       margin-top: 22px;
       display: none;
     }
 
-    .result.show {
-      display: block;
-      animation: slideIn 0.3s ease;
-    }
+    .result.show { display: block; animation: slideIn 0.3s ease; }
 
     @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-8px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     .result-title {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: #e85d04;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 12px;
+      font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.6px; margin-bottom: 12px;
     }
+    .theme-meesho  .result-title { color: #e85d04; }
+    .theme-flipkart .result-title { color: #2874f0; }
+    .theme-amazon  .result-title { color: #cc7a00; }
 
     .result-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 7px 0;
-      border-bottom: 1px solid #f5dfd0;
-      font-size: 0.88rem;
+      display: flex; justify-content: space-between;
+      padding: 7px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.87rem;
     }
+    .result-row:last-child { border-bottom: none; }
+    .result-row .lbl { color: #666; }
+    .result-row .val { font-weight: 600; color: #1a1a1a; }
+    .result-row.sub .lbl { color: #aaa; font-size: 0.77rem; padding-left: 14px; font-style: italic; }
+    .result-row.sub .val { color: #aaa; font-size: 0.77rem; font-weight: 400; }
+    .result-row.itc .val { color: #2e7d32; }
+    .result-row.total-row { margin-top: 8px; padding-top: 10px; border-top: 1.5px solid #ddd; border-bottom: none; }
+    .result-row.total-row .lbl { font-weight: 700; color: #333; }
 
-    .result-row:last-child {
-      border-bottom: none;
-    }
-
-    .result-row .lbl {
-      color: #666;
-    }
-
-    .result-row .val {
-      font-weight: 600;
-      color: #1a1a1a;
-    }
-
-    .result-row.sub .lbl {
-      color: #aaa;
-      font-size: 0.78rem;
-      padding-left: 14px;
-      font-style: italic;
-    }
-
-    .result-row.sub .val {
-      color: #aaa;
-      font-size: 0.78rem;
-      font-weight: 400;
-    }
-
-    .result-row.itc .val {
-      color: #2e7d32;
-    }
-
-    .result-row.total-row .lbl {
-      font-weight: 700;
-      color: #333;
-    }
-
-    .result-row.total-row .val {
-      color: #e85d04;
-      font-size: 1.05rem;
-    }
+    .theme-meesho  .result-row.total-row .val { color: #e85d04; }
+    .theme-flipkart .result-row.total-row .val { color: #2874f0; }
+    .theme-amazon  .result-row.total-row .val { color: #cc7a00; }
 
     .gst-strip {
-      background: #fff3ea;
-      margin: 10px -18px 0 -18px;
-      padding: 10px 18px;
-      font-size: 0.78rem;
-      color: #888;
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
+      margin: 10px -18px 0; padding: 10px 18px;
+      font-size: 0.78rem; color: #888; display: flex; gap: 16px; flex-wrap: wrap;
     }
-
-    .gst-strip span b {
-      color: #1a1a1a;
-    }
+    .theme-meesho  .gst-strip { background: #fff3ea; }
+    .theme-flipkart .gst-strip { background: #eef3ff; }
+    .theme-amazon  .gst-strip { background: #fff8e6; }
+    .gst-strip span b { color: #1a1a1a; }
 
     .final-price-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0 8px;
-      border-top: 2px solid #e85d04;
-      margin-top: 8px;
-      font-size: 1rem;
+      display: flex; justify-content: space-between;
+      padding: 12px 0 8px; border-top: 2px solid; margin-top: 8px;
     }
+    .theme-meesho  .final-price-row { border-color: #e85d04; }
+    .theme-flipkart .final-price-row { border-color: #2874f0; }
+    .theme-amazon  .final-price-row { border-color: #cc7a00; }
+    .final-price-row .lbl { font-weight: 700; color: #1a1a1a; font-size: 0.95rem; }
+    .final-price-row .val { font-weight: 800; font-size: 1.2rem; }
+    .theme-meesho  .final-price-row .val { color: #e85d04; }
+    .theme-flipkart .final-price-row .val { color: #2874f0; }
+    .theme-amazon  .final-price-row .val { color: #cc7a00; }
 
-    .final-price-row .lbl {
-      font-weight: 700;
-      color: #1a1a1a;
-    }
+    .profit-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.87rem; }
+    .profit-row .lbl { color: #666; }
+    .profit-row .val { font-weight: 600; color: #2e7d32; }
+    .profit-row.margin-row .val { color: #1a1a1a; }
 
-    .final-price-row .val {
-      font-weight: 800;
-      color: #e85d04;
-      font-size: 1.2rem;
-    }
-
-    .profit-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 5px 0;
-      font-size: 0.88rem;
-    }
-
-    .profit-row .lbl {
-      color: #666;
-    }
-
-    .profit-row .val {
-      font-weight: 600;
-      color: #2e7d32;
-    }
-
-    .margin-row .val {
-      color: #1a1a1a;
-    }
-
-    .qr-section {
-      margin-top: 18px;
-      padding-top: 16px;
-      border-top: 1px solid #f5d8c0;
-    }
-
-    .qr-title {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
-    }
-
-    .qr-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
+    .qr-section { margin-top: 18px; padding-top: 16px; border-top: 1px solid #eee; }
+    .qr-title { font-size: 0.7rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .qr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .qr-item {
-      background: white;
-      border: 1px solid #f0d8c8;
-      border-radius: 8px;
-      padding: 8px 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: white; border: 1px solid #e8e8e8; border-radius: 8px;
+      padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
     }
+    .qr-item .qr-label { font-size: 0.77rem; color: #666; }
+    .qr-item .qr-value { font-size: 0.9rem; font-weight: 700; }
+    .theme-meesho  .qr-item .qr-value { color: #e85d04; }
+    .theme-flipkart .qr-item .qr-value { color: #2874f0; }
+    .theme-amazon  .qr-item .qr-value { color: #cc7a00; }
 
-    .qr-item .qr-label {
-      font-size: 0.78rem;
-      color: #666;
-    }
+    .qr-item.breakeven { grid-column: 1 / -1; }
+    .theme-meesho  .qr-item.breakeven { background: #fff3ea; border-color: #e85d04; }
+    .theme-flipkart .qr-item.breakeven { background: #eef3ff; border-color: #2874f0; }
+    .theme-amazon  .qr-item.breakeven { background: #fff8e6; border-color: #cc7a00; }
+    .qr-item.breakeven .qr-label { font-weight: 600; color: #444; }
+    .qr-item.breakeven .qr-value { font-size: 1rem; }
 
-    .qr-item .qr-value {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #e85d04;
-    }
-
-    .qr-item.breakeven {
-      grid-column: 1 / -1;
-      background: #fff3ea;
-    }
-
-    .qr-item.breakeven .qr-label {
-      font-weight: 600;
-      color: #555;
-    }
-
-    .qr-item.breakeven .qr-value {
-      font-size: 1rem;
+    @media (max-width: 480px) {
+      .container { padding: 20px 16px; }
+      .qr-grid { grid-template-columns: 1fr; }
+      .qr-item.breakeven { grid-column: 1; }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>Meesho Price Calculator</h1>
-    <p class="subtitle">Realistic selling price with all costs — returns, RTO, damage &amp; taxes</p>
 
-    <form id="calculatorForm">
-
-      <div class="section">
-        <div class="section-title">Product Costs</div>
-        <div class="row">
-          <div class="field">
-            <label>Product Cost (COGS) *</label>
-            <input type="number" id="productCost" placeholder="e.g. 150" min="0" step="0.01" required>
-            <div class="help">Landed cost: purchase + inward freight + QC</div>
-          </div>
-          <div class="field">
-            <label>Packaging Cost</label>
-            <input type="number" id="packagingCost" placeholder="e.g. 15" min="0" step="0.01" value="15">
-            <div class="help">Box, bubble wrap, tape, label per unit</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Forward Shipping</div>
-        <div class="row">
-          <div class="field">
-            <label>Shipping Zone</label>
-            <select id="shippingZone">
-              <option value="local">Local (Intra-city)</option>
-              <option value="regional">Regional (Intra-state)</option>
-              <option value="national" selected>National (Inter-state)</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Weight Slab</label>
-            <select id="weightSlab">
-              <option value="500" selected>Up to 500g</option>
-              <option value="1000">500g - 1kg</option>
-              <option value="1500">1kg - 1.5kg</option>
-              <option value="2000">1.5kg - 2kg</option>
-            </select>
-          </div>
-        </div>
-        <div class="help" style="margin-top:8px;">Forward Shipping &amp; GST on Shipping (18%) are auto-calculated from
-          zone + weight slab.</div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Returns, RTO &amp; Losses</div>
-        <div class="row">
-          <div class="field">
-            <label>Customer Return %</label>
-            <input type="number" id="returnRate" placeholder="e.g. 10" min="0" max="100" step="1" value="10">
-            <div class="help">% orders returned by customer after delivery</div>
-          </div>
-          <div class="field">
-            <label>Reverse Shipping Cost</label>
-            <input type="number" id="reverseShipping" placeholder="e.g. 60" min="0" step="0.01" value="60">
-            <div class="help">Per customer-return shipment</div>
-          </div>
-        </div>
-        <div class="row" style="margin-top:10px;">
-          <div class="field">
-            <label>RTO %</label>
-            <input type="number" id="rtoRate" placeholder="e.g. 10" min="0" max="100" step="1" value="10">
-            <div class="help">% orders undelivered &amp; returned (RTO)</div>
-          </div>
-          <div class="field">
-            <label>RTO Shipping Cost</label>
-            <input type="number" id="rtoShipping" placeholder="e.g. 55" min="0" step="0.01" value="55">
-            <div class="help">Per RTO shipment back to warehouse</div>
-          </div>
-        </div>
-        <div class="row" style="margin-top:10px;">
-          <div class="field">
-            <label>Damage / Loss %</label>
-            <input type="number" id="damageLossRate" placeholder="e.g. 2" min="0" max="100" step="0.1" value="2">
-            <div class="help">% orders with damage or lost in transit (product cost written off)</div>
-          </div>
-          <div class="field"></div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Other Costs</div>
-        <div class="row">
-          <div class="field">
-            <label>Advertisement Cost per Order</label>
-            <input type="number" id="adSpend" placeholder="e.g. 10" min="0" step="0.01" value="0">
-            <div class="help">Avg ad spend allocated per sold order</div>
-          </div>
-          <div class="field">
-            <label>Other Meesho Charges</label>
-            <input type="number" id="otherCharges" placeholder="e.g. 5" min="0" step="0.01" value="0">
-            <div class="help">Any other platform / operational charges</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Taxes &amp; Target</div>
-        <div class="row">
-          <div class="field">
-            <label>GST Rate %</label>
-            <select id="gstRate">
-              <option value="5">5% (Essential items)</option>
-              <option value="12">12% (Home decor, Lighting)</option>
-              <option value="18" selected>18% (Electronics, etc.)</option>
-              <option value="28">28% (Luxury goods)</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Actual ITC Amount (&#8377;)</label>
-            <input type="number" id="itcAmount" placeholder="e.g. 17" min="0" step="0.01" value="0">
-            <div class="help">Enter actual ITC &#8377; from your purchase/service invoices only</div>
-          </div>
-        </div>
-        <div class="row" style="margin-top:10px;">
-          <div class="field">
-            <label>Target Profit Margin %</label>
-            <input type="number" id="targetMargin" placeholder="e.g. 20" min="0" max="100" step="1" value="20">
-            <div class="help">Net profit as % of selling price excl. GST (standard accounting basis)</div>
-          </div>
-          <div class="field"></div>
-        </div>
-      </div>
-
-      <button type="submit" class="btn">Calculate Selling Price</button>
-    </form>
-
-    <div id="result" class="result">
-      <div class="result-title">Price Breakdown</div>
-
-      <div class="result-row"><span class="lbl">1. Product Cost</span><span class="val"
-          id="r-productCost">&#8377;0</span></div>
-      <div class="result-row"><span class="lbl">2. Packaging</span><span class="val" id="r-packaging">&#8377;0</span>
-      </div>
-      <div class="result-row"><span class="lbl">3. Forward Shipping</span><span class="val"
-          id="r-fwdShipping">&#8377;0</span></div>
-      <div class="result-row"><span class="lbl">4. GST on Shipping (18%)</span><span class="val"
-          id="r-gstShipping">&#8377;0</span></div>
-      <div class="result-row"><span class="lbl">5. Customer Return Cost</span><span class="val"
-          id="r-returnCost">&#8377;0</span></div>
-      <div class="result-row sub"><span class="lbl" id="r-returnDetail"></span><span class="val"></span></div>
-      <div class="result-row"><span class="lbl">6. RTO Cost</span><span class="val" id="r-rtoCost">&#8377;0</span></div>
-      <div class="result-row sub"><span class="lbl" id="r-rtoDetail"></span><span class="val"></span></div>
-      <div class="result-row"><span class="lbl">7. Damage / Loss Cost</span><span class="val"
-          id="r-damageCost">&#8377;0</span></div>
-      <div class="result-row sub"><span class="lbl" id="r-damageDetail"></span><span class="val"></span></div>
-      <div class="result-row"><span class="lbl">8. Advertisement Cost</span><span class="val"
-          id="r-adSpend">&#8377;0</span></div>
-      <div class="result-row"><span class="lbl">9. Other Meesho Charges</span><span class="val"
-          id="r-otherCharges">&#8377;0</span></div>
-      <div class="result-row itc"><span class="lbl">10. Less: Eligible ITC Credit</span><span class="val"
-          id="r-itc">-&#8377;0</span></div>
-
-      <div class="result-row total-row"
-        style="margin-top:6px; padding-top:10px; border-top:1.5px solid #e85d04; border-bottom:none;">
-        <span class="lbl">Total Cost per Order</span>
-        <span class="val" id="r-totalCost">&#8377;0</span>
-      </div>
-
-      <div class="gst-strip">
-        <span>Selling Price (excl. GST): <b id="r-exGst">&#8377;0</b></span>
-        <span>+ GST: <b id="r-gstAmt">&#8377;0</b></span>
-      </div>
-
-      <div class="final-price-row">
-        <span class="lbl">Final Customer Price (incl. GST)</span>
-        <span class="val" id="r-finalPrice">&#8377;0</span>
-      </div>
-
-      <div class="profit-row">
-        <span class="lbl">Net Profit per Order</span>
-        <span class="val" id="r-netProfit">&#8377;0</span>
-      </div>
-      <div class="profit-row margin-row">
-        <span class="lbl">Actual Margin</span>
-        <span class="val" id="r-actualMargin">0%</span>
-      </div>
-
-      <div class="qr-section">
-        <div class="qr-title">Quick Reference &mdash; Prices (incl. GST)</div>
-        <div class="qr-grid">
-          <div class="qr-item breakeven">
-            <span class="qr-label">Break-even Price (0% margin)</span>
-            <span class="qr-value" id="r-breakeven">&#8377;0</span>
-          </div>
-          <div class="qr-item">
-            <span class="qr-label">10% Margin</span>
-            <span class="qr-value" id="r-m10">&#8377;0</span>
-          </div>
-          <div class="qr-item">
-            <span class="qr-label">15% Margin</span>
-            <span class="qr-value" id="r-m15">&#8377;0</span>
-          </div>
-          <div class="qr-item">
-            <span class="qr-label">20% Margin</span>
-            <span class="qr-value" id="r-m20">&#8377;0</span>
-          </div>
-          <div class="qr-item">
-            <span class="qr-label">25% Margin</span>
-            <span class="qr-value" id="r-m25">&#8377;0</span>
-          </div>
-          <div class="qr-item">
-            <span class="qr-label">30% Margin</span>
-            <span class="qr-value" id="r-m30">&#8377;0</span>
-          </div>
-        </div>
-      </div>
+  <!-- Dropdown selector -->
+  <div class="top-bar">
+    <div class="platform-select-wrap">
+      <label for="platformSelect">Select Platform:</label>
+      <select id="platformSelect" onchange="switchPlatform(this.value)">
+        <option value="meesho"   selected>🟠 Meesho</option>
+        <option value="flipkart">🔵 Flipkart</option>
+        <option value="amazon">🟡 Amazon</option>
+      </select>
     </div>
   </div>
 
+  <div class="container" id="mainContainer">
+
+    <!-- ════════════════════════════════
+         MEESHO FORM
+    ════════════════════════════════ -->
+    <div id="form-meesho" class="platform-form theme-meesho active">
+      <div class="platform-header">
+        <h1>Meesho Price Calculator</h1>
+        <span class="platform-badge badge-meesho">Meesho</span>
+      </div>
+      <p class="subtitle">Realistic selling price with all costs — returns, RTO, damage &amp; taxes</p>
+
+      <form id="meeshoForm" onsubmit="calculate(event,'meesho')">
+
+        <!-- Meesho Platform Fees -->
+        <div class="fee-box">
+          <div class="fee-box-title">Meesho Platform Fees</div>
+          <div class="row">
+            <div class="field">
+              <label>Commission %</label>
+              <div class="slider-wrap">
+                <input type="range" id="m-commission" min="0" max="30" step="0.5" value="0"
+                  oninput="document.getElementById('m-commissionVal').textContent=this.value+'%'">
+                <span class="slider-val" id="m-commissionVal">0%</span>
+              </div>
+              <div class="help">Meesho currently charges 0% commission on most categories</div>
+            </div>
+            <div class="field">
+              <label>Collection / Payment Fee %</label>
+              <div class="slider-wrap">
+                <input type="range" id="m-collectionFee" min="0" max="5" step="0.1" value="1.1"
+                  oninput="document.getElementById('m-collectionFeeVal').textContent=parseFloat(this.value).toFixed(1)+'%'">
+                <span class="slider-val" id="m-collectionFeeVal">1.1%</span>
+              </div>
+              <div class="help">Payment gateway / collection fee deducted by Meesho</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Product Costs</div>
+          <div class="row">
+            <div class="field">
+              <label>Product Cost (COGS) *</label>
+              <input type="number" id="m-productCost" placeholder="e.g. 150" min="0" step="0.01" required>
+              <div class="help">Landed cost: purchase + inward freight + QC</div>
+            </div>
+            <div class="field">
+              <label>Packaging Cost</label>
+              <input type="number" id="m-packagingCost" placeholder="e.g. 15" min="0" step="0.01" value="15">
+              <div class="help">Box, bubble wrap, tape, label per unit</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Forward Shipping</div>
+          <div class="row">
+            <div class="field">
+              <label>Shipping Zone</label>
+              <select id="m-shippingZone" class="field-select">
+                <option value="local">Local (Intra-city)</option>
+                <option value="regional">Regional (Intra-state)</option>
+                <option value="national" selected>National (Inter-state)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Weight Slab</label>
+              <select id="m-weightSlab" class="field-select">
+                <option value="500" selected>Up to 500 g</option>
+                <option value="1000">500 g – 1 kg</option>
+                <option value="1500">1 kg – 1.5 kg</option>
+                <option value="2000">1.5 kg – 2 kg</option>
+              </select>
+            </div>
+          </div>
+          <div class="help" style="margin-top:8px;">Forward shipping &amp; GST on shipping (18%) auto-calculated from zone + weight slab.</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Returns, RTO &amp; Losses</div>
+          <div class="row">
+            <div class="field">
+              <label>Customer Return %</label>
+              <input type="number" id="m-returnRate" placeholder="e.g. 10" min="0" max="100" step="1" value="10">
+              <div class="help">% orders returned after delivery</div>
+            </div>
+            <div class="field">
+              <label>Reverse Shipping Cost (&#8377;)</label>
+              <input type="number" id="m-reverseShipping" placeholder="e.g. 60" min="0" step="0.01" value="60">
+              <div class="help">Per customer-return shipment</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label>RTO %</label>
+              <input type="number" id="m-rtoRate" placeholder="e.g. 10" min="0" max="100" step="1" value="10">
+              <div class="help">% orders undelivered &amp; returned (RTO)</div>
+            </div>
+            <div class="field">
+              <label>RTO Shipping Cost (&#8377;)</label>
+              <input type="number" id="m-rtoShipping" placeholder="e.g. 55" min="0" step="0.01" value="55">
+              <div class="help">Per RTO shipment back to warehouse</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label>Damage / Loss %</label>
+              <input type="number" id="m-damageLossRate" placeholder="e.g. 2" min="0" max="100" step="0.1" value="2">
+              <div class="help">% orders damaged or lost in transit</div>
+            </div>
+            <div class="field"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Other Costs</div>
+          <div class="row">
+            <div class="field">
+              <label>Advertisement Cost per Order (&#8377;)</label>
+              <input type="number" id="m-adSpend" placeholder="e.g. 10" min="0" step="0.01" value="0">
+              <div class="help">Avg ad spend allocated per sold order</div>
+            </div>
+            <div class="field">
+              <label>Other Charges (&#8377;)</label>
+              <input type="number" id="m-otherCharges" placeholder="e.g. 5" min="0" step="0.01" value="0">
+              <div class="help">Any other platform / operational charges</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Taxes &amp; Target Profit</div>
+          <div class="row">
+            <div class="field">
+              <label>GST Rate %</label>
+              <select id="m-gstRate" class="field-select">
+                <option value="0">0% (Exempted)</option>
+                <option value="5">5% (Essential items)</option>
+                <option value="12">12% (Home decor)</option>
+                <option value="18" selected>18% (Electronics, etc.)</option>
+                <option value="28">28% (Luxury goods)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Actual ITC Amount (&#8377;)</label>
+              <input type="number" id="m-itcAmount" placeholder="e.g. 17" min="0" step="0.01" value="0">
+              <div class="help">Actual ITC &#8377; from purchase invoices only</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label>Target Profit Margin %</label>
+              <input type="number" id="m-targetMargin" placeholder="e.g. 20" min="0" max="100" step="1" value="20">
+              <div class="help">Net profit as % of selling price excl. GST</div>
+            </div>
+            <div class="field"></div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn">Calculate Selling Price on Meesho</button>
+      </form>
+
+      <!-- Meesho Result -->
+      <div id="m-result" class="result">
+        <div class="result-title">Price Breakdown — Meesho</div>
+        <div class="result-row"><span class="lbl">1. Product Cost</span><span class="val" id="m-r-productCost">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">2. Packaging</span><span class="val" id="m-r-packaging">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">3. Forward Shipping</span><span class="val" id="m-r-fwdShipping">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">4. GST on Shipping (18%)</span><span class="val" id="m-r-gstShipping">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">5. Meesho Platform Fees</span><span class="val" id="m-r-platformFee">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="m-r-platformFeeDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">6. Customer Return Cost</span><span class="val" id="m-r-returnCost">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="m-r-returnDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">7. RTO Cost</span><span class="val" id="m-r-rtoCost">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="m-r-rtoDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">8. Damage / Loss Cost</span><span class="val" id="m-r-damageCost">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="m-r-damageDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">9. Advertisement Cost</span><span class="val" id="m-r-adSpend">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">10. Other Charges</span><span class="val" id="m-r-otherCharges">&#8377;0</span></div>
+        <div class="result-row itc"><span class="lbl">11. Less: ITC Credit</span><span class="val" id="m-r-itc">-&#8377;0</span></div>
+        <div class="result-row total-row">
+          <span class="lbl">Total Cost per Order</span><span class="val" id="m-r-totalCost">&#8377;0</span>
+        </div>
+        <div class="gst-strip">
+          <span>Selling Price (excl. GST): <b id="m-r-exGst">&#8377;0</b></span>
+          <span>+ GST: <b id="m-r-gstAmt">&#8377;0</b></span>
+        </div>
+        <div class="final-price-row">
+          <span class="lbl">Final Customer Price (incl. GST)</span>
+          <span class="val" id="m-r-finalPrice">&#8377;0</span>
+        </div>
+        <div class="profit-row"><span class="lbl">Net Profit per Order</span><span class="val" id="m-r-netProfit">&#8377;0</span></div>
+        <div class="profit-row margin-row"><span class="lbl">Actual Margin</span><span class="val" id="m-r-actualMargin">0%</span></div>
+        <div class="qr-section">
+          <div class="qr-title">Quick Reference — Prices (incl. GST)</div>
+          <div class="qr-grid">
+            <div class="qr-item breakeven"><span class="qr-label">Break-even (0% margin)</span><span class="qr-value" id="m-r-breakeven">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">10% Margin</span><span class="qr-value" id="m-r-m10">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">15% Margin</span><span class="qr-value" id="m-r-m15">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">20% Margin</span><span class="qr-value" id="m-r-m20">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">25% Margin</span><span class="qr-value" id="m-r-m25">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">30% Margin</span><span class="qr-value" id="m-r-m30">&#8377;0</span></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /meesho form -->
+
+
+    <!-- ════════════════════════════════
+         FLIPKART FORM
+    ════════════════════════════════ -->
+    <div id="form-flipkart" class="platform-form theme-flipkart">
+      <div class="platform-header">
+        <h1>Flipkart Price Calculator</h1>
+        <span class="platform-badge badge-flipkart">Flipkart</span>
+      </div>
+      <p class="subtitle">Realistic selling price with all Flipkart fees — commission, closing, returns &amp; taxes</p>
+
+      <form id="flipkartForm" onsubmit="calculate(event,'flipkart')">
+
+        <!-- Flipkart Platform Fees -->
+        <div class="fee-box">
+          <div class="fee-box-title">Flipkart Platform Fees</div>
+          <div class="row">
+            <div class="field">
+              <label>Commission %</label>
+              <div class="slider-wrap">
+                <input type="range" id="f-commission" min="0" max="30" step="0.5" value="8"
+                  oninput="document.getElementById('f-commissionVal').textContent=this.value+'%'">
+                <span class="slider-val" id="f-commissionVal">8%</span>
+              </div>
+              <div class="help">Apparel ~8%, Electronics ~5%, Lifestyle ~10%</div>
+            </div>
+            <div class="field">
+              <label>Fixed Closing Fee (&#8377;)</label>
+              <input type="number" id="f-closingFee" placeholder="e.g. 30" min="0" step="1" value="30">
+              <div class="help">Per-order fixed fee charged by Flipkart</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label>Collection / Payment Fee %</label>
+              <div class="slider-wrap">
+                <input type="range" id="f-collectionFee" min="0" max="5" step="0.1" value="1.8"
+                  oninput="document.getElementById('f-collectionFeeVal').textContent=parseFloat(this.value).toFixed(1)+'%'">
+                <span class="slider-val" id="f-collectionFeeVal">1.8%</span>
+              </div>
+              <div class="help">Payment gateway / collection fee</div>
+            </div>
+            <div class="field">
+              <label>Tech Fee %</label>
+              <div class="slider-wrap">
+                <input type="range" id="f-techFee" min="0" max="5" step="0.1" value="0"
+                  oninput="document.getElementById('f-techFeeVal').textContent=parseFloat(this.value).toFixed(1)+'%'">
+                <span class="slider-val" id="f-techFeeVal">0%</span>
+              </div>
+              <div class="help">Flipkart tech / seller platform fee (if applicable)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Product Costs</div>
+          <div class="row">
+            <div class="field">
+              <label>Product Cost (COGS) *</label>
+              <input type="number" id="f-productCost" placeholder="e.g. 150" min="0" step="0.01" required>
+              <div class="help">Landed cost: purchase + inward freight + QC</div>
+            </div>
+            <div class="field">
+              <label>Packaging Cost</label>
+              <input type="number" id="f-packagingCost" placeholder="e.g. 15" min="0" step="0.01" value="15">
+              <div class="help">Box, bubble wrap, tape, label per unit</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Forward Shipping</div>
+          <div class="row">
+            <div class="field">
+              <label>Shipping Zone</label>
+              <select id="f-shippingZone" class="field-select">
+                <option value="local">Local (Intra-city)</option>
+                <option value="regional">Regional (Intra-state)</option>
+                <option value="national" selected>National (Inter-state)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Weight Slab</label>
+              <select id="f-weightSlab" class="field-select">
+                <option value="500" selected>Up to 500 g</option>
+                <option value="1000">500 g – 1 kg</option>
+                <option value="1500">1 kg – 1.5 kg</option>
+                <option value="2000">1.5 kg – 2 kg</option>
+              </select>
+            </div>
+          </div>
+          <div class="help" style="margin-top:8px;">Forward shipping &amp; GST on shipping (18%) auto-calculated from zone + weight slab.</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Returns, RTO &amp; Losses</div>
+          <div class="row">
+            <div class="field">
+              <label>Customer Return %</label>
+              <input type="number" id="f-returnRate" placeholder="e.g. 10" min="0" max="100" step="1" value="10">
+              <div class="help">% orders returned after delivery</div>
+            </div>
+            <div class="field">
+              <label>Reverse Shipping Cost (&#8377;)</label>
+              <input type="number" id="f-reverseShipping" placeholder="e.g. 60" min="0" step="0.01" value="60">
+              <div class="help">Per customer-return shipment</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label>RTO %</label>
+              <input type="number" id="f-rtoRate" placeholder="e.g. 10" min="0" max="100" step="1" value="10">
+              <div class="help">% orders undelivered &amp; returned (RTO)</div>
+            </div>
+            <div class="field">
+              <label>RTO Shipping Cost (&#8377;)</label>
+              <input type="number" id="f-rtoShipping" placeholder="e.g. 55" min="0" step="0.01" value="55">
+              <div class="help">Per RTO shipment back to warehouse</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label>Damage / Loss %</label>
+              <input type="number" id="f-damageLossRate" placeholder="e.g. 2" min="0" max="100" step="0.1" value="2">
+              <div class="help">% orders damaged or lost in transit</div>
+            </div>
+            <div class="field"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Other Costs</div>
+          <div class="row">
+            <div class="field">
+              <label>Advertisement Cost per Order (&#8377;)</label>
+              <input type="number" id="f-adSpend" placeholder="e.g. 10" min="0" step="0.01" value="0">
+              <div class="help">Avg ad spend allocated per sold order</div>
+            </div>
+            <div class="field">
+              <label>Other Charges (&#8377;)</label>
+              <input type="number" id="f-otherCharges" placeholder="e.g. 5" min="0" step="0.01" value="0">
+              <div class="help">Any other platform / operational charges</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Taxes &amp; Target Profit</div>
+          <div class="row">
+            <div class="field">
+              <label>GST Rate %</label>
+              <select id="f-gstRate" class="field-select">
+                <option value="0">0% (Exempted)</option>
+                <option value="5">5% (Essential items)</option>
+                <option value="12">12% (Home decor)</option>
+                <option value="18" selected>18% (Electronics, etc.)</option>
+                <option value="28">28% (Luxury goods)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Actual ITC Amount (&#8377;)</label>
+              <input type="number" id="f-itcAmount" placeholder="e.g. 17" min="0" step="0.01" value="0">
+              <div class="help">Actual ITC &#8377; from purchase invoices only</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label>Target Profit Margin %</label>
+              <input type="number" id="f-targetMargin" placeholder="e.g. 20" min="0" max="100" step="1" value="20">
+              <div class="help">Net profit as % of selling price excl. GST</div>
+            </div>
+            <div class="field"></div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn">Calculate Selling Price on Flipkart</button>
+      </form>
+
+      <!-- Flipkart Result -->
+      <div id="f-result" class="result">
+        <div class="result-title">Price Breakdown — Flipkart</div>
+        <div class="result-row"><span class="lbl">1. Product Cost</span><span class="val" id="f-r-productCost">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">2. Packaging</span><span class="val" id="f-r-packaging">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">3. Forward Shipping</span><span class="val" id="f-r-fwdShipping">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">4. GST on Shipping (18%)</span><span class="val" id="f-r-gstShipping">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">5. Flipkart Platform Fees</span><span class="val" id="f-r-platformFee">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="f-r-platformFeeDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">6. Customer Return Cost</span><span class="val" id="f-r-returnCost">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="f-r-returnDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">7. RTO Cost</span><span class="val" id="f-r-rtoCost">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="f-r-rtoDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">8. Damage / Loss Cost</span><span class="val" id="f-r-damageCost">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="f-r-damageDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">9. Advertisement Cost</span><span class="val" id="f-r-adSpend">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">10. Other Charges</span><span class="val" id="f-r-otherCharges">&#8377;0</span></div>
+        <div class="result-row itc"><span class="lbl">11. Less: ITC Credit</span><span class="val" id="f-r-itc">-&#8377;0</span></div>
+        <div class="result-row total-row">
+          <span class="lbl">Total Cost per Order</span><span class="val" id="f-r-totalCost">&#8377;0</span>
+        </div>
+        <div class="gst-strip">
+          <span>Selling Price (excl. GST): <b id="f-r-exGst">&#8377;0</b></span>
+          <span>+ GST: <b id="f-r-gstAmt">&#8377;0</b></span>
+        </div>
+        <div class="final-price-row">
+          <span class="lbl">Final Customer Price (incl. GST)</span>
+          <span class="val" id="f-r-finalPrice">&#8377;0</span>
+        </div>
+        <div class="profit-row"><span class="lbl">Net Profit per Order</span><span class="val" id="f-r-netProfit">&#8377;0</span></div>
+        <div class="profit-row margin-row"><span class="lbl">Actual Margin</span><span class="val" id="f-r-actualMargin">0%</span></div>
+        <div class="qr-section">
+          <div class="qr-title">Quick Reference — Prices (incl. GST)</div>
+          <div class="qr-grid">
+            <div class="qr-item breakeven"><span class="qr-label">Break-even (0% margin)</span><span class="qr-value" id="f-r-breakeven">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">10% Margin</span><span class="qr-value" id="f-r-m10">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">15% Margin</span><span class="qr-value" id="f-r-m15">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">20% Margin</span><span class="qr-value" id="f-r-m20">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">25% Margin</span><span class="qr-value" id="f-r-m25">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">30% Margin</span><span class="qr-value" id="f-r-m30">&#8377;0</span></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /flipkart form -->
+
+
+    <!-- ════════════════════════════════
+         AMAZON FORM
+    ════════════════════════════════ -->
+    <div id="form-amazon" class="platform-form theme-amazon">
+      <div class="platform-header">
+        <h1>Amazon Price Calculator</h1>
+        <span class="platform-badge badge-amazon">Amazon</span>
+      </div>
+      <p class="subtitle">Realistic selling price with all Amazon fees — referral, closing, FBA, returns &amp; taxes</p>
+
+      <form id="amazonForm" onsubmit="calculate(event,'amazon')">
+
+        <!-- Amazon Platform Fees -->
+        <div class="fee-box">
+          <div class="fee-box-title">Amazon Platform Fees</div>
+          <div class="row">
+            <div class="field">
+              <label>Referral Fee %</label>
+              <div class="slider-wrap">
+                <input type="range" id="a-referral" min="0" max="30" step="0.5" value="9"
+                  oninput="document.getElementById('a-referralVal').textContent=this.value+'%'">
+                <span class="slider-val" id="a-referralVal">9%</span>
+              </div>
+              <div class="help">Apparel ~9%, Electronics ~5%, Books ~5%, Shoes ~15%</div>
+            </div>
+            <div class="field">
+              <label>Closing Fee (&#8377;)</label>
+              <input type="number" id="a-closingFee" placeholder="e.g. 25" min="0" step="1" value="25">
+              <div class="help">Fixed per-item closing fee charged by Amazon</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label>FBA / Fulfilment Fee (&#8377;)</label>
+              <input type="number" id="a-fba" placeholder="e.g. 0" min="0" step="1" value="0">
+              <div class="help">Fulfilment by Amazon fee per unit (0 if self-ship)</div>
+            </div>
+            <div class="field">
+              <label>Collection / Payment Fee %</label>
+              <div class="slider-wrap">
+                <input type="range" id="a-collectionFee" min="0" max="5" step="0.1" value="2"
+                  oninput="document.getElementById('a-collectionFeeVal').textContent=parseFloat(this.value).toFixed(1)+'%'">
+                <span class="slider-val" id="a-collectionFeeVal">2%</span>
+              </div>
+              <div class="help">Amazon payment collection / gateway fee</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Product Costs</div>
+          <div class="row">
+            <div class="field">
+              <label>Product Cost (COGS) *</label>
+              <input type="number" id="a-productCost" placeholder="e.g. 150" min="0" step="0.01" required>
+              <div class="help">Landed cost: purchase + inward freight + QC</div>
+            </div>
+            <div class="field">
+              <label>Packaging Cost</label>
+              <input type="number" id="a-packagingCost" placeholder="e.g. 15" min="0" step="0.01" value="15">
+              <div class="help">Box, bubble wrap, tape, label per unit</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Forward Shipping</div>
+          <div class="row">
+            <div class="field">
+              <label>Shipping Zone</label>
+              <select id="a-shippingZone" class="field-select">
+                <option value="local">Local (Intra-city)</option>
+                <option value="regional">Regional (Intra-state)</option>
+                <option value="national" selected>National (Inter-state)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Weight Slab</label>
+              <select id="a-weightSlab" class="field-select">
+                <option value="500" selected>Up to 500 g</option>
+                <option value="1000">500 g – 1 kg</option>
+                <option value="1500">1 kg – 1.5 kg</option>
+                <option value="2000">1.5 kg – 2 kg</option>
+              </select>
+            </div>
+          </div>
+          <div class="help" style="margin-top:8px;">Forward shipping &amp; GST on shipping (18%) auto-calculated. Leave override blank to use rate table.</div>
+          <div style="margin-top:10px;">
+            <div class="field">
+              <label>Custom Shipping Cost (&#8377;) — Optional Override</label>
+              <input type="number" id="a-shippingOverride" placeholder="Leave blank to use rate table" min="0" step="1">
+              <div class="help">Useful for Easy Ship or negotiated rates. Leave blank to auto-calculate.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Returns, RTO &amp; Losses</div>
+          <div class="row">
+            <div class="field">
+              <label>Customer Return %</label>
+              <input type="number" id="a-returnRate" placeholder="e.g. 10" min="0" max="100" step="1" value="10">
+              <div class="help">% orders returned after delivery</div>
+            </div>
+            <div class="field">
+              <label>Reverse Shipping Cost (&#8377;)</label>
+              <input type="number" id="a-reverseShipping" placeholder="e.g. 60" min="0" step="0.01" value="60">
+              <div class="help">Per customer-return shipment</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label>RTO %</label>
+              <input type="number" id="a-rtoRate" placeholder="e.g. 10" min="0" max="100" step="1" value="10">
+              <div class="help">% orders undelivered &amp; returned (RTO)</div>
+            </div>
+            <div class="field">
+              <label>RTO Shipping Cost (&#8377;)</label>
+              <input type="number" id="a-rtoShipping" placeholder="e.g. 55" min="0" step="0.01" value="55">
+              <div class="help">Per RTO shipment back to warehouse</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label>Damage / Loss %</label>
+              <input type="number" id="a-damageLossRate" placeholder="e.g. 2" min="0" max="100" step="0.1" value="2">
+              <div class="help">% orders damaged or lost in transit</div>
+            </div>
+            <div class="field"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Other Costs</div>
+          <div class="row">
+            <div class="field">
+              <label>Advertisement Cost per Order (&#8377;)</label>
+              <input type="number" id="a-adSpend" placeholder="e.g. 10" min="0" step="0.01" value="0">
+              <div class="help">Avg ad spend allocated per sold order</div>
+            </div>
+            <div class="field">
+              <label>Other Charges (&#8377;)</label>
+              <input type="number" id="a-otherCharges" placeholder="e.g. 5" min="0" step="0.01" value="0">
+              <div class="help">Any other platform / operational charges</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Taxes &amp; Target Profit</div>
+          <div class="row">
+            <div class="field">
+              <label>GST Rate %</label>
+              <select id="a-gstRate" class="field-select">
+                <option value="0">0% (Exempted)</option>
+                <option value="5">5% (Essential items)</option>
+                <option value="12">12% (Home decor)</option>
+                <option value="18" selected>18% (Electronics, etc.)</option>
+                <option value="28">28% (Luxury goods)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Actual ITC Amount (&#8377;)</label>
+              <input type="number" id="a-itcAmount" placeholder="e.g. 17" min="0" step="0.01" value="0">
+              <div class="help">Actual ITC &#8377; from purchase invoices only</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label>Target Profit Margin %</label>
+              <input type="number" id="a-targetMargin" placeholder="e.g. 20" min="0" max="100" step="1" value="20">
+              <div class="help">Net profit as % of selling price excl. GST</div>
+            </div>
+            <div class="field"></div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn">Calculate Selling Price on Amazon</button>
+      </form>
+
+      <!-- Amazon Result -->
+      <div id="a-result" class="result">
+        <div class="result-title">Price Breakdown — Amazon</div>
+        <div class="result-row"><span class="lbl">1. Product Cost</span><span class="val" id="a-r-productCost">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">2. Packaging</span><span class="val" id="a-r-packaging">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">3. Forward Shipping</span><span class="val" id="a-r-fwdShipping">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">4. GST on Shipping (18%)</span><span class="val" id="a-r-gstShipping">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">5. Amazon Platform Fees</span><span class="val" id="a-r-platformFee">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="a-r-platformFeeDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">6. Customer Return Cost</span><span class="val" id="a-r-returnCost">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="a-r-returnDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">7. RTO Cost</span><span class="val" id="a-r-rtoCost">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="a-r-rtoDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">8. Damage / Loss Cost</span><span class="val" id="a-r-damageCost">&#8377;0</span></div>
+        <div class="result-row sub"><span class="lbl" id="a-r-damageDetail"></span><span class="val"></span></div>
+        <div class="result-row"><span class="lbl">9. Advertisement Cost</span><span class="val" id="a-r-adSpend">&#8377;0</span></div>
+        <div class="result-row"><span class="lbl">10. Other Charges</span><span class="val" id="a-r-otherCharges">&#8377;0</span></div>
+        <div class="result-row itc"><span class="lbl">11. Less: ITC Credit</span><span class="val" id="a-r-itc">-&#8377;0</span></div>
+        <div class="result-row total-row">
+          <span class="lbl">Total Cost per Order</span><span class="val" id="a-r-totalCost">&#8377;0</span>
+        </div>
+        <div class="gst-strip">
+          <span>Selling Price (excl. GST): <b id="a-r-exGst">&#8377;0</b></span>
+          <span>+ GST: <b id="a-r-gstAmt">&#8377;0</b></span>
+        </div>
+        <div class="final-price-row">
+          <span class="lbl">Final Customer Price (incl. GST)</span>
+          <span class="val" id="a-r-finalPrice">&#8377;0</span>
+        </div>
+        <div class="profit-row"><span class="lbl">Net Profit per Order</span><span class="val" id="a-r-netProfit">&#8377;0</span></div>
+        <div class="profit-row margin-row"><span class="lbl">Actual Margin</span><span class="val" id="a-r-actualMargin">0%</span></div>
+        <div class="qr-section">
+          <div class="qr-title">Quick Reference — Prices (incl. GST)</div>
+          <div class="qr-grid">
+            <div class="qr-item breakeven"><span class="qr-label">Break-even (0% margin)</span><span class="qr-value" id="a-r-breakeven">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">10% Margin</span><span class="qr-value" id="a-r-m10">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">15% Margin</span><span class="qr-value" id="a-r-m15">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">20% Margin</span><span class="qr-value" id="a-r-m20">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">25% Margin</span><span class="qr-value" id="a-r-m25">&#8377;0</span></div>
+            <div class="qr-item"><span class="qr-label">30% Margin</span><span class="qr-value" id="a-r-m30">&#8377;0</span></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /amazon form -->
+
+  </div><!-- /container -->
+
   <script>
+    /* ── Shipping tables ── */
     const shippingRates = {
-      local: { 500: 40, 1000: 60, 1500: 75, 2000: 85 },
-      regional: { 500: 55, 1000: 80, 1500: 100, 2000: 115 },
-      national: { 500: 70, 1000: 100, 1500: 125, 2000: 145 }
+      meesho: {
+        local:    { 500:40,  1000:60,  1500:75,  2000:85  },
+        regional: { 500:55,  1000:80,  1500:100, 2000:115 },
+        national: { 500:70,  1000:100, 1500:125, 2000:145 }
+      },
+      flipkart: {
+        local:    { 500:42,  1000:66,  1500:84,  2000:102 },
+        regional: { 500:58,  1000:88,  1500:110, 2000:132 },
+        national: { 500:74,  1000:110, 1500:138, 2000:166 }
+      },
+      amazon: {
+        local:    { 500:38,  1000:58,  1500:76,  2000:95  },
+        regional: { 500:52,  1000:80,  1500:102, 2000:124 },
+        national: { 500:68,  1000:102, 1500:130, 2000:158 }
+      }
     };
 
+    /* ── Switch platform ── */
+    function switchPlatform(p) {
+      document.querySelectorAll('.platform-form').forEach(el => el.classList.remove('active'));
+      document.getElementById('form-' + p).classList.add('active');
+    }
+
+    /* ── Helper ── */
     function fmt(n) {
       return '\u20B9' + Math.round(n).toLocaleString('en-IN');
     }
 
-    // margin on ex-GST settlement: settlement = totalCost / (1 - margin)
-    // finalPrice = settlement * (1 + gstRate) / 0.989
-    function priceAtMargin(totalCost, gstRate, margin) {
-      if (margin >= 1) return Infinity;
-      const settlement = totalCost / (1 - margin);
-      return settlement * (1 + gstRate) / 0.989;
+    /* Analytical solve:
+       SP * [(1-margin)/(1+gst) - commPct] = baseCost + fixedFee
+    */
+    function priceAtMargin(baseCost, gstRate, margin, commPct, fixedFee) {
+      const lhs = (1 - margin) / (1 + gstRate) - commPct;
+      if (lhs <= 0) return Infinity;
+      return (baseCost + fixedFee) / lhs;
     }
 
-    document.getElementById('calculatorForm').addEventListener('submit', function (e) {
+    /* ── Main calculate function ── */
+    function calculate(e, platform) {
       e.preventDefault();
+      const px = platform[0]; // 'm', 'f', 'a'
 
-      const productCost = parseFloat(document.getElementById('productCost').value) || 0;
-      const packagingCost = parseFloat(document.getElementById('packagingCost').value) || 0;
-      const shippingZone = document.getElementById('shippingZone').value;
-      const weightSlab = document.getElementById('weightSlab').value;
-      const returnRate = (parseFloat(document.getElementById('returnRate').value) || 0) / 100;
-      const reverseShipping = parseFloat(document.getElementById('reverseShipping').value) || 0;
-      const rtoRate = (parseFloat(document.getElementById('rtoRate').value) || 0) / 100;
-      const rtoShipping = parseFloat(document.getElementById('rtoShipping').value) || 0;
-      const damageLossRate = (parseFloat(document.getElementById('damageLossRate').value) || 0) / 100;
-      const adSpend = parseFloat(document.getElementById('adSpend').value) || 0;
-      const otherCharges = parseFloat(document.getElementById('otherCharges').value) || 0;
-      const gstRate = parseFloat(document.getElementById('gstRate').value) / 100;
-      const itcCredit = parseFloat(document.getElementById('itcAmount').value) || 0;
-      const targetMargin = (parseFloat(document.getElementById('targetMargin').value) || 0) / 100;
+      function g(id)  { return parseFloat(document.getElementById(px + '-' + id).value) || 0; }
+      function gs(id) { return document.getElementById(px + '-' + id).value; }
 
-      // Derived shipping costs
-      const fwdShipping = shippingRates[shippingZone][weightSlab];
+      const productCost     = g('productCost');
+      const packagingCost   = g('packagingCost');
+      const shippingZone    = gs('shippingZone');
+      const weightSlab      = gs('weightSlab');
+      const returnRate      = g('returnRate') / 100;
+      const reverseShipping = g('reverseShipping');
+      const rtoRate         = g('rtoRate') / 100;
+      const rtoShipping     = g('rtoShipping');
+      const damageLossRate  = g('damageLossRate') / 100;
+      const adSpend         = g('adSpend');
+      const otherCharges    = g('otherCharges');
+      const gstRate         = parseFloat(document.getElementById(px + '-gstRate').value) / 100;
+      const itcCredit       = g('itcAmount');
+      const targetMargin    = g('targetMargin') / 100;
+
+      // Shipping
+      let fwdShipping;
+      if (platform === 'amazon') {
+        const override = parseFloat(document.getElementById('a-shippingOverride').value);
+        fwdShipping = (!isNaN(override) && override > 0)
+          ? override
+          : shippingRates.amazon[shippingZone][weightSlab];
+      } else {
+        fwdShipping = shippingRates[platform][shippingZone][weightSlab];
+      }
       const gstOnShipping = fwdShipping * 0.18;
 
-      // Return costs: customer return = returnRate x (reverseShipping + packagingCost repack)
+      // Returns / RTO / Damage
       const returnCost = returnRate * (reverseShipping + packagingCost);
-      // RTO costs: rtoRate x (rtoShipping + packagingCost lost)
-      const rtoCost = rtoRate * (rtoShipping + packagingCost);
-      // Damage/Loss: product cost written off
+      const rtoCost    = rtoRate    * (rtoShipping    + packagingCost);
       const damageCost = damageLossRate * productCost;
 
-      const totalCost = productCost + packagingCost + fwdShipping + gstOnShipping
+      // Platform % commission & fixed fees
+      let commPct = 0, fixedFee = 0, feeDetail = '';
+      if (platform === 'meesho') {
+        const comm = g('commission') / 100;
+        const coll = g('collectionFee') / 100;
+        commPct  = comm + coll;
+        fixedFee = 0;
+        feeDetail = 'Comm ' + (comm*100).toFixed(1) + '% + Coll ' + (coll*100).toFixed(1) + '%';
+      } else if (platform === 'flipkart') {
+        const comm    = g('commission') / 100;
+        const coll    = g('collectionFee') / 100;
+        const tech    = g('techFee') / 100;
+        const closing = g('closingFee');
+        commPct  = comm + coll + tech;
+        fixedFee = closing;
+        feeDetail = 'Comm ' + (comm*100).toFixed(1) + '% + Coll ' + (coll*100).toFixed(1) + '% + Closing \u20B9' + closing;
+      } else {
+        const ref     = g('referral') / 100;
+        const coll    = g('collectionFee') / 100;
+        const closing = g('closingFee');
+        const fba     = g('fba');
+        commPct  = ref + coll;
+        fixedFee = closing + fba;
+        feeDetail = 'Ref ' + (ref*100).toFixed(1) + '% + Coll ' + (coll*100).toFixed(1) + '% + Closing \u20B9' + closing + (fba ? ' + FBA \u20B9' + fba : '');
+      }
+
+      // Base cost (excluding % commission)
+      const baseCost = productCost + packagingCost + fwdShipping + gstOnShipping
         + returnCost + rtoCost + damageCost
         + adSpend + otherCharges - itcCredit;
 
-      // Margin on ex-GST settlement (correct basis — GST is pass-through)
-      // settlement = totalCost / (1 - targetMargin)
-      // finalPrice = settlement * (1 + gstRate) / 0.989
-      const settlement = totalCost / (1 - targetMargin);
-      const finalPrice = settlement * (1 + gstRate) / 0.989;
-      const exGst = finalPrice / (1 + gstRate);
-      const gstAmt = finalPrice - exGst;
+      // Solve for final price
+      const finalPrice  = priceAtMargin(baseCost, gstRate, targetMargin, commPct, fixedFee);
+      const platformFee = commPct * finalPrice + fixedFee;
+      const totalCost   = baseCost + platformFee;
+      const exGst       = finalPrice / (1 + gstRate);
+      const gstAmt      = finalPrice - exGst;
+      const netProfit   = exGst - totalCost;
+      const actualMargin = (netProfit / exGst) * 100;
 
-      const netProfit = settlement - totalCost;
-      const actualMargin = (netProfit / settlement) * 100;  // on ex-GST settlement
-
-      // Quick reference (all incl. GST, margin on ex-GST settlement)
-      const breakeven = priceAtMargin(totalCost, gstRate, 0);
-      const m10 = priceAtMargin(totalCost, gstRate, 0.10);
-      const m15 = priceAtMargin(totalCost, gstRate, 0.15);
-      const m20 = priceAtMargin(totalCost, gstRate, 0.20);
-      const m25 = priceAtMargin(totalCost, gstRate, 0.25);
-      const m30 = priceAtMargin(totalCost, gstRate, 0.30);
+      // Quick reference
+      const margins  = [0, 0.10, 0.15, 0.20, 0.25, 0.30];
+      const qrPrices = margins.map(m => priceAtMargin(baseCost, gstRate, m, commPct, fixedFee));
 
       // Update DOM
-      document.getElementById('r-productCost').textContent = fmt(productCost);
-      document.getElementById('r-packaging').textContent = fmt(packagingCost);
-      document.getElementById('r-fwdShipping').textContent = fmt(fwdShipping);
-      document.getElementById('r-gstShipping').textContent = fmt(gstOnShipping);
-      document.getElementById('r-returnCost').textContent = fmt(returnCost);
-      document.getElementById('r-returnDetail').textContent =
-        (returnRate * 100).toFixed(0) + '% \u00D7 (Rev. Ship \u20B9' + reverseShipping + ' + Pkg \u20B9' + packagingCost + ')';
-      document.getElementById('r-rtoCost').textContent = fmt(rtoCost);
-      document.getElementById('r-rtoDetail').textContent =
-        (rtoRate * 100).toFixed(0) + '% \u00D7 (RTO Ship \u20B9' + rtoShipping + ' + Pkg \u20B9' + packagingCost + ')';
-      document.getElementById('r-damageCost').textContent = fmt(damageCost);
-      document.getElementById('r-damageDetail').textContent =
-        (damageLossRate * 100).toFixed(1) + '% \u00D7 Product Cost \u20B9' + productCost;
-      document.getElementById('r-adSpend').textContent = fmt(adSpend);
-      document.getElementById('r-otherCharges').textContent = fmt(otherCharges);
-      document.getElementById('r-itc').textContent = '-' + fmt(itcCredit);
-      document.getElementById('r-totalCost').textContent = fmt(totalCost);
-      document.getElementById('r-exGst').textContent = fmt(exGst);
-      document.getElementById('r-gstAmt').textContent = fmt(gstAmt);
-      document.getElementById('r-finalPrice').textContent = fmt(finalPrice);
-      document.getElementById('r-netProfit').textContent = fmt(netProfit);
-      document.getElementById('r-actualMargin').textContent = actualMargin.toFixed(1) + '%';
+      const r = px + '-r-';
+      function set(id, v) { document.getElementById(r + id).textContent = v; }
 
-      document.getElementById('r-breakeven').textContent = fmt(breakeven);
-      document.getElementById('r-m10').textContent = fmt(m10);
-      document.getElementById('r-m15').textContent = fmt(m15);
-      document.getElementById('r-m20').textContent = fmt(m20);
-      document.getElementById('r-m25').textContent = fmt(m25);
-      document.getElementById('r-m30').textContent = fmt(m30);
+      set('productCost',      fmt(productCost));
+      set('packaging',        fmt(packagingCost));
+      set('fwdShipping',      fmt(fwdShipping));
+      set('gstShipping',      fmt(gstOnShipping));
+      set('platformFee',      fmt(platformFee));
+      set('platformFeeDetail', feeDetail + ' on \u20B9' + Math.round(finalPrice).toLocaleString('en-IN'));
+      set('returnCost',       fmt(returnCost));
+      set('returnDetail',     (returnRate*100).toFixed(0) + '% \u00D7 (Rev. Ship \u20B9' + reverseShipping + ' + Pkg \u20B9' + packagingCost + ')');
+      set('rtoCost',          fmt(rtoCost));
+      set('rtoDetail',        (rtoRate*100).toFixed(0) + '% \u00D7 (RTO Ship \u20B9' + rtoShipping + ' + Pkg \u20B9' + packagingCost + ')');
+      set('damageCost',       fmt(damageCost));
+      set('damageDetail',     (damageLossRate*100).toFixed(1) + '% \u00D7 Product Cost \u20B9' + productCost);
+      set('adSpend',          fmt(adSpend));
+      set('otherCharges',     fmt(otherCharges));
+      set('itc',              '-' + fmt(itcCredit));
+      set('totalCost',        fmt(totalCost));
+      set('exGst',            fmt(exGst));
+      set('gstAmt',           fmt(gstAmt));
+      set('finalPrice',       fmt(finalPrice));
+      set('netProfit',        fmt(netProfit));
+      set('actualMargin',     actualMargin.toFixed(1) + '%');
+      set('breakeven',        fmt(qrPrices[0]));
+      set('m10',              fmt(qrPrices[1]));
+      set('m15',              fmt(qrPrices[2]));
+      set('m20',              fmt(qrPrices[3]));
+      set('m25',              fmt(qrPrices[4]));
+      set('m30',              fmt(qrPrices[5]));
 
-      const resultEl = document.getElementById('result');
+      const resultEl = document.getElementById(px + '-result');
       resultEl.classList.add('show');
       resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
+    }
   </script>
-</body>
 
+</body>
 </html>
